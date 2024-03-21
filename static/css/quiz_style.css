@@ -1,0 +1,117 @@
+:root {
+  --background-color: #191a25;
+  --question-card-bg-color: #28293d;
+  --accent-color: #40c1ac;
+  --text-color: #fdfdfd;
+  --button-bg-color: var(--question-card-bg-color);
+  --button-border-color: var(--accent-color);
+  --button-hover-bg-color: #2596be;
+  --correct-color: #008000;
+  --incorrect-color: #ff0000;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  text-align: justify;
+  overflow-y: auto;
+}
+
+.question,
+.card {
+  background-color: var(--question-card-bg-color);
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  padding: 20px;
+  width: 90%;
+  max-width: 840px;
+  text-align: justify;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+h3 {
+  color: var(--accent-color);
+  margin-bottom: 30px;
+  font-size: 18px;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+label {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-color);
+  display: inline;
+  vertical-align: middle;
+}
+
+.answer-container {
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fdfdfd;
+  background-color: #28293d;
+  border: 2px solid #40c1ac;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 150px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+}
+
+.correct {
+  background-color: var(--correct-color);
+}
+
+.incorrect {
+  background-color: var(--incorrect-color);
+}
+
+.card-back,
+.translated-text {
+  color: var(--text-color);
+}
+
+.translate-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--accent-color);
+  opacity: 50%;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+

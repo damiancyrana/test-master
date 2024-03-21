@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ file_name }}</title>
+    <link rel="stylesheet" href="/static/css/quiz_style.css" />
+  </head>
+
+  <body>
+    <form id="quizForm" method="POST" action="/">
+      {% for question in questions %}
+      <div class="question" data-question-id="{{ question.id }}">
+        
+        <!-- Card Front -->
+        <div class="card-front">
+          <h3>{{ question.question }}</h3>
+          {% for answer in question.answers %}
+          <div class="answer-container">
+            <input
+              type="checkbox"
+              name="question{{ question.id }}"
+              id="answer{{ loop.index0 }}_{{ loop.index }}"
+              value="{{ answer.text }}"
+              data-is-correct="{{ 'true' if answer.is_correct else 'false' }}"
+            />
+            <label for="answer{{ loop.index0 }}_{{ loop.index }}">{{ answer.text }}</label>
+          </div>
+          {% endfor %}
+
+          <div class="button-container">
+            <button type="button" onclick="checkAnswer(this)">Check</button>
+            <button type="button" onclick="showCorrectAnswer(this)">Correct</button>
+            <button type="button" class="translate-button" onclick="translateQuestion('{{ question.id }}')">Translate <span class="progress-bar" style="width: 0%"></span></button>
+            <button type="button" onclick="restart(this)">Restart</button>
+          </div>
+        </div>
+
+        <!-- Card Back -->
+        <div class="card-back" style="display: none">
+          <div class="translated-text"></div>
+          <div class="button-container"><button type="button" onclick="flipCardBack('{{ question.id }}')">Back</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <div class="button-container">
+        <button type="button" onclick="submitQuiz()">Powtórz błędne odpowiedzi</button>
+      </div>
+    </form>
+
+    <script src="/static/js/quiz_script.js"></script>
+  </body>
+</html>
