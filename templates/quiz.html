@@ -44,9 +44,11 @@
       </div>
       {% endfor %}
 
-      <div class="button-container">
+      <div class="button-container column">
         <button type="button" onclick="submitQuiz()">Powtórz błędne odpowiedzi</button>
+        <div id="incorrectAnswersCount" style="margin-top: 10px;">Udzielono 0 błędnych odpowiedzi</div>
       </div>
+      
     </form>
 
     <script src="/static/js/quiz_script.js"></script>

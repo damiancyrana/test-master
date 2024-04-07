@@ -69,6 +69,11 @@ label {
   margin-top: 40px;
 }
 
+.button-container.column {
+  flex-direction: column;
+  align-items: center;
+}
+
 button {
   padding: 10px 20px;
   font-size: 16px;
@@ -115,3 +120,25 @@ button:hover {
   transition: width 0.5s ease;
 }
 
+#incorrectAnswersCount {
+  padding: 20px;
+  font-size: 1.2rem;
+  background-color: var(--button-bg-color);
+  color: var(--text-color);
+
+  margin-top: 20px;
+  margin-bottom: 50px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#incorrectAnswersCount.low {
+  background-color: var(--correct-color);
+  color: #fff;
+}
+
+#incorrectAnswersCount.high {
+  background-color: var(--incorrect-color);
+  color: #fff;
+}

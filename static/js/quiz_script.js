@@ -1,4 +1,5 @@
 let incorrectAnswers = [];
+let answeredQuestions = 0;
 
 
 function toggleAnswerState(input, correct) {
@@ -29,6 +30,26 @@ function checkAnswer(button) {
 
   button.disabled = true;
   button.nextElementSibling.nextElementSibling.disabled = false;
+  
+  answeredQuestions++;
+  updateIncorrectAnswersCount();
+}
+
+
+function updateIncorrectAnswersCount() {
+  const incorrectAnswersCount = incorrectAnswers.length;
+  const totalQuestions = document.querySelectorAll('.question').length;
+  const percentage = (incorrectAnswersCount / totalQuestions) * 100;
+  const incorrectAnswersElement = document.getElementById("incorrectAnswersCount");
+
+  incorrectAnswersElement.innerText = `Udzielono ${incorrectAnswersCount} błędnych odpowiedzi z ${totalQuestions} (${percentage.toFixed(2)} %)`;
+  incorrectAnswersElement.className = '';
+
+  if (percentage > 1) {
+    incorrectAnswersElement.classList.add("high");
+  } else {
+    incorrectAnswersElement.classList.add("low");
+  }
 }
 
 
