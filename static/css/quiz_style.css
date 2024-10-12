@@ -5,7 +5,7 @@
   --text-color: #fdfdfd;
   --button-bg-color: var(--question-card-bg-color);
   --button-border-color: var(--accent-color);
-  --button-hover-bg-color: #2596be;
+  --button-hover-bg-color: var(--accent-color);
   --correct-color: #008000;
   --incorrect-color: #ff0000;
 }
@@ -17,31 +17,43 @@ body {
   background-color: var(--background-color);
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  text-align: justify;
   overflow-y: auto;
+  text-align: justify;
 }
 
 .question,
-.card {
+.card,
+.congratulations {
   background-color: var(--question-card-bg-color);
   border-radius: 8px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  margin: 20px;
+  margin: 20px auto;
   padding: 20px;
   width: 90%;
   max-width: 840px;
-  text-align: justify;
   line-height: 1.5;
   word-wrap: break-word;
 }
 
-h3 {
+.congratulations {
+  margin-top: 50px;
+  padding: 40px;
+  max-width: 600px;
+  text-align: center;
+}
+
+h3,
+.congratulations h1 {
   color: var(--accent-color);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   font-size: 18px;
+}
+
+.congratulations p {
+  font-size: 18px;
+  color: var(--text-color);
 }
 
 input[type="radio"],
@@ -77,18 +89,20 @@ label {
 button {
   padding: 10px 20px;
   font-size: 16px;
-  color: #fdfdfd;
-  background-color: #28293d;
-  border: 2px solid #40c1ac;
+  color: var(--text-color);
+  background-color: var(--button-bg-color);
+  border: 2px solid var(--button-border-color);
   border-radius: 8px;
   cursor: pointer;
   min-width: 150px;
   text-align: center;
   transition: background-color 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 button:hover {
-  background-color: var(--accent-color);
+  background-color: var(--button-hover-bg-color);
 }
 
 .correct {
@@ -104,18 +118,13 @@ button:hover {
   color: var(--text-color);
 }
 
-.translate-button {
-  position: relative;
-  overflow: hidden;
-}
-
 .progress-bar {
   position: absolute;
   bottom: 0;
   left: 0;
   height: 100%;
   background-color: var(--accent-color);
-  opacity: 50%;
+  opacity: 0.5;
   width: 0%;
   transition: width 0.5s ease;
 }
@@ -125,9 +134,7 @@ button:hover {
   font-size: 1.2rem;
   background-color: var(--button-bg-color);
   color: var(--text-color);
-
-  margin-top: 20px;
-  margin-bottom: 50px;
+  margin: 20px 0 50px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: background-color 0.3s, color 0.3s;
@@ -135,10 +142,13 @@ button:hover {
 
 #incorrectAnswersCount.low {
   background-color: var(--correct-color);
-  color: #fff;
 }
 
 #incorrectAnswersCount.high {
   background-color: var(--incorrect-color);
-  color: #fff;
+}
+
+#incorrectAnswersCount.low,
+#incorrectAnswersCount.high {
+  color: var(--text-color);
 }

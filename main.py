@@ -19,10 +19,10 @@ tokenizer = MT5Tokenizer.from_pretrained(model_name)
 def load_and_shuffle_questions(filepath: Path) -> list:
     """
     Loads questions from a JSON file and shuffles them, including their answers
-    
+
     Args:
         filepath (Path): The path to the JSON file containing the questions
-      
+
     Returns:
         list: A list of shuffled questions with shuffled answers
     """
@@ -37,18 +37,25 @@ def load_and_shuffle_questions(filepath: Path) -> list:
 @app.route("/", methods=["GET", "POST"])
 def quiz():
     """
-    Handles the quiz page. On POST, it filters and displays incorrect answers for retry
-    On GET, it displays a new set of shuffled questions
-    
+    Handles the quiz page. On POST, it filters and displays incorrect answers for retry On GET, it displays a new set of shuffled questions
+
     Returns:
-        render_template: The quiz page with questions or the retry page with incorrect answers
+        render_template: The quiz page with questions or the congratulations page
     """
     file_title = questions_path.stem.replace('-', ' ')
     if request.method == "POST":
         incorrect_answers_ids = request.form.getlist('incorrect_answers[]')
-        questions = load_and_shuffle_questions(questions_path)
-        incorrect_questions = [q for q in questions if str(q['id']) in incorrect_answers_ids]
-        return render_template("retry_quiz.html", questions=incorrect_questions, file_name=file_title)
+        if incorrect_answers_ids:
+            questions = load_and_shuffle_questions(questions_path)
+            incorrect_questions = [q for q in questions if str(q['id']) in incorrect_answers_ids]
+            if incorrect_questions:
+                return render_template("quiz.html", questions=incorrect_questions, file_name=file_title)
+            else:
+                # All questions answered correctly
+                return render_template("congratulations.html", file_name=file_title)
+        else:
+            # All questions answered correctly
+            return render_template("congratulations.html", file_name=file_title)
     else:
         questions = load_and_shuffle_questions(questions_path)
         return render_template("quiz.html", questions=questions, file_name=file_title)
@@ -58,12 +65,12 @@ def quiz():
 def translate_text(text: str, extra_length_factor: float = 1.5, min_length: int = 40) -> str:
     """
     Translates the given text using the loaded model and tokenizer. Results are cached for efficiency
-    
+
     Args:
         text (str): The text to translate
         extra_length_factor (float): Factor to adjust the maximum length of the translation
         min_length (int): Minimum length of the translation to ensure quality
-        
+
     Returns:
         str: The translated text
     """
@@ -79,7 +86,7 @@ def translate_text(text: str, extra_length_factor: float = 1.5, min_length: int 
 def translate():
     """
     API endpoint for translating questions and answers. Expects a JSON payload with question and answers
-    
+
     Returns:
         jsonify: The translated question and answers in JSON format
     """

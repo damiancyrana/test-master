@@ -1,6 +1,8 @@
 let incorrectAnswers = [];
 let answeredQuestions = 0;
-
+let translationCache = {};
+let totalTranslations = 0;
+let completedTranslations = 0;
 
 function toggleAnswerState(input, correct) {
   input.nextElementSibling.classList.toggle("correct", correct);
@@ -8,22 +10,25 @@ function toggleAnswerState(input, correct) {
   input.disabled = true;
 }
 
-
 function checkAnswer(button) {
   const questionDiv = button.closest(".question");
   const questionId = questionDiv.getAttribute("data-question-id");
   const inputs = questionDiv.querySelectorAll('input[type="checkbox"]');
   let correctAnswerFound = false;
+  let correctAnswers = 0;
+  let selectedCorrectAnswers = 0;
 
   inputs.forEach((input) => {
     const isCorrect = input.dataset.isCorrect === "true";
+    if (isCorrect) correctAnswers++;
     if (input.checked) {
+      if (isCorrect) selectedCorrectAnswers++;
       correctAnswerFound = correctAnswerFound || isCorrect;
       toggleAnswerState(input, isCorrect);
     }
   });
 
-  if (!correctAnswerFound) {
+  if (selectedCorrectAnswers !== correctAnswers) {
     incorrectAnswers.push(questionId);
     button.nextElementSibling.style.display = "inline-block";
   }
@@ -35,7 +40,6 @@ function checkAnswer(button) {
   updateIncorrectAnswersCount();
 }
 
-
 function updateIncorrectAnswersCount() {
   const incorrectAnswersCount = incorrectAnswers.length;
   const totalQuestions = document.querySelectorAll('.question').length;
@@ -45,13 +49,12 @@ function updateIncorrectAnswersCount() {
   incorrectAnswersElement.innerText = `Udzielono ${incorrectAnswersCount} błędnych odpowiedzi z ${totalQuestions} (${percentage.toFixed(2)} %)`;
   incorrectAnswersElement.className = '';
 
-  if (percentage > 1) {
+  if (percentage > 0) {
     incorrectAnswersElement.classList.add("high");
   } else {
     incorrectAnswersElement.classList.add("low");
   }
 }
-
 
 function restart(button) {
   const questionDiv = button.closest(".question");
@@ -64,7 +67,6 @@ function restart(button) {
   button.disabled = true;
 }
 
-
 function showCorrectAnswer(button) {
   button
     .closest(".question")
@@ -74,32 +76,54 @@ function showCorrectAnswer(button) {
     });
 }
 
-
 function submitQuiz() {
   document
     .querySelectorAll("#quizForm input[type='hidden']")
     .forEach((e) => e.remove());
 
-  incorrectAnswers.forEach((questionId) => {
+  if (incorrectAnswers.length === 0) {
+    // Jeśli nie ma błędnych odpowiedzi, wysyłamy pusty formularz
     const hiddenField = document.createElement("input");
     hiddenField.type = "hidden";
     hiddenField.name = "incorrect_answers[]";
-    hiddenField.value = questionId;
+    hiddenField.value = "";
     document.getElementById("quizForm").appendChild(hiddenField);
-  });
+  } else {
+    incorrectAnswers.forEach((questionId) => {
+      const hiddenField = document.createElement("input");
+      hiddenField.type = "hidden";
+      hiddenField.name = "incorrect_answers[]";
+      hiddenField.value = questionId;
+      document.getElementById("quizForm").appendChild(hiddenField);
+    });
+  }
+
   document.getElementById("quizForm").submit();
 }
-
 
 function translateQuestion(questionId) {
   const button = document.querySelector(
     `.question[data-question-id="${questionId}"] .translate-button`
   );
+  const progressBar = button.querySelector(".progress-bar");
 
-  const progressBar = document.createElement("span");
-  progressBar.classList.add("progress-bar");
-  button.appendChild(progressBar);
+  if (translationCache[questionId]) {
+    // Użyj przetłumaczonej zawartości z pamięci podręcznej
+    showTranslation(questionId);
+  } else {
+    // Pobierz tłumaczenie i zapisz w pamięci podręcznej
+    fetchAndCacheTranslation(questionId, progressBar, () => {
+      showTranslation(questionId);
+    });
+  }
+}
+
+function fetchAndCacheTranslation(questionId, progressBar, callback) {
+  const button = document.querySelector(
+    `.question[data-question-id="${questionId}"] .translate-button`
+  );
   button.disabled = true;
+  progressBar.style.width = "0%";
 
   var questionText = document.querySelector(
     `.question[data-question-id="${questionId}"] .card-front h3`
@@ -113,19 +137,16 @@ function translateQuestion(questionId) {
 
   let animationFrameId;
   let progress = 0;
-
   const startTime = performance.now();
-  const duration = 15000;
-  const maxProgressBeforeTranslationEnds = 95;
+  const duration = 15000; // 15 sekund
 
   const animate = (time) => {
     const currentTime = performance.now();
     const elapsedTime = currentTime - startTime;
     progress = (elapsedTime / duration) * 100;
-    progress = Math.min(progress, maxProgressBeforeTranslationEnds);
-    progressBar.style.width = `${progress}%`;
+    progressBar.style.width = `${Math.min(progress, 95)}%`;
 
-    if (progress < maxProgressBeforeTranslationEnds) {
+    if (progress < 95) {
       animationFrameId = requestAnimationFrame(animate);
     }
   };
@@ -144,32 +165,78 @@ function translateQuestion(questionId) {
       cancelAnimationFrame(animationFrameId);
       progressBar.style.width = "100%";
 
-      const cardBack = document.querySelector(
-        `.question[data-question-id="${questionId}"] .card-back`
-      );
-      const translatedContent =
-        `<h3>${data.question}</h3>` +
-        data.answers.map((answer) => `<p>${answer}</p>`).join("");
-
-      cardBack.querySelector(".translated-text").innerHTML = translatedContent;
-
+      // Zapisz tłumaczenie w pamięci podręcznej
+      translationCache[questionId] = {
+        question: data.question,
+        answers: data.answers,
+      };
+      button.disabled = false;
       setTimeout(() => {
-        flipCard(questionId);
-        setTimeout(() => {
-          progressBar.remove();
-          button.disabled = false;
-        }, 500);
+        progressBar.style.width = "0%";
       }, 500);
+      if (callback) callback();
     })
-
     .catch((error) => {
       console.error("Error:", error);
       cancelAnimationFrame(animationFrameId);
-      progressBar.remove();
       button.disabled = false;
+      progressBar.style.width = "0%";
     });
 }
 
+function showTranslation(questionId) {
+  const cardBack = document.querySelector(
+    `.question[data-question-id="${questionId}"] .card-back`
+  );
+
+  const data = translationCache[questionId];
+
+  const translatedContent =
+    `<h3>${data.question}</h3>` +
+    data.answers.map((answer) => `<p>${answer}</p>`).join("");
+
+  cardBack.querySelector(".translated-text").innerHTML = translatedContent;
+
+  flipCard(questionId);
+}
+
+function translateAll() {
+  const questionDivs = document.querySelectorAll('.question');
+  const translateAllButton = document.getElementById('translateAllButton');
+  const progressBar = translateAllButton.querySelector('.progress-bar');
+  translateAllButton.disabled = true;
+
+  totalTranslations = questionDivs.length;
+  completedTranslations = 0;
+
+  let progress = 0;
+
+  const updateProgressBar = () => {
+    progress = (completedTranslations / totalTranslations) * 100;
+    progressBar.style.width = `${progress}%`;
+    if (completedTranslations === totalTranslations) {
+      translateAllButton.disabled = false;
+      setTimeout(() => {
+        progressBar.style.width = "0%";
+      }, 500);
+    }
+  };
+
+  questionDivs.forEach((questionDiv) => {
+    const questionId = questionDiv.getAttribute('data-question-id');
+    if (!translationCache[questionId]) {
+      const button = questionDiv.querySelector('.translate-button');
+      const individualProgressBar = button.querySelector('.progress-bar');
+      fetchAndCacheTranslation(questionId, individualProgressBar, () => {
+        completedTranslations++;
+        updateProgressBar();
+      });
+    } else {
+      completedTranslations++;
+      updateProgressBar();
+    }
+  });
+}
 
 function flipCard(questionId) {
   const questionDiv = document.querySelector(
@@ -187,4 +254,3 @@ function flipCard(questionId) {
 function flipCardBack(questionId) {
   flipCard(questionId);
 }
-

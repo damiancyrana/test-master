@@ -27,7 +27,7 @@ def save_questions_to_file(questions, file_name):
 
 def main():
     number_of_questions = int(input("How many questions do you want to generate? "))
-    add_ids = input("Do you want to add IDs to questions? (Yes/No): ").lower() == 'yes'
+    add_ids = input("Do you want to add IDs to questions? (Yes/No): ").lower() == 'yes' or 'y'
     file_name = input("Please enter the file name (without extension): ") + '.json'
     
     questions_template = generate_blank_template(number_of_questions, add_ids=add_ids)
