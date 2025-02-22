@@ -49,7 +49,7 @@ function updateIncorrectAnswersCount() {
   incorrectAnswersElement.innerText = `Udzielono ${incorrectAnswersCount} błędnych odpowiedzi z ${totalQuestions} (${percentage.toFixed(2)} %)`;
   incorrectAnswersElement.className = '';
 
-  if (percentage > 0) {
+  if (percentage >= 70) {
     incorrectAnswersElement.classList.add("high");
   } else {
     incorrectAnswersElement.classList.add("low");
@@ -138,7 +138,7 @@ function fetchAndCacheTranslation(questionId, progressBar, callback) {
   let animationFrameId;
   let progress = 0;
   const startTime = performance.now();
-  const duration = 15000; // 15 sekund
+  const duration = 18000; // 15 sekund
 
   const animate = (time) => {
     const currentTime = performance.now();

@@ -11,9 +11,13 @@
       {% for question in questions %}
       <div class="question" data-question-id="{{ question.id }}">
         
+        <!-- Numer pytania w lewym górnym rogu -->
+        <div class="question-id">#{{ question.id }}</div>
+
         <!-- Card Front -->
         <div class="card-front">
-          <h3>{{ question.question }}</h3>
+          <!-- Treść pytania -->
+          <h3>{{ question.question|safe }}</h3>
           {% for answer in question.answers %}
           <div class="answer-container">
             <input
@@ -23,14 +27,16 @@
               value="{{ answer.text }}"
               data-is-correct="{{ 'true' if answer.is_correct else 'false' }}"
             />
-            <label for="answer{{ loop.index0 }}_{{ loop.index }}">{{ answer.text }}</label>
+            <label for="answer{{ loop.index0 }}_{{ loop.index }}">{{ answer.text|safe }}</label>
           </div>
           {% endfor %}
 
           <div class="button-container">
             <button type="button" onclick="checkAnswer(this)">Check</button>
             <button type="button" onclick="showCorrectAnswer(this)">Correct</button>
-            <button type="button" class="translate-button" onclick="translateQuestion('{{ question.id }}')">Translate <span class="progress-bar" style="width: 0%"></span></button>
+            <button type="button" class="translate-button" onclick="translateQuestion('{{ question.id }}')">
+              Translate <span class="progress-bar" style="width: 0%"></span>
+            </button>
             <button type="button" onclick="restart(this)">Restart</button>
           </div>
         </div>
@@ -38,7 +44,8 @@
         <!-- Card Back -->
         <div class="card-back" style="display: none">
           <div class="translated-text"></div>
-          <div class="button-container"><button type="button" onclick="flipCardBack('{{ question.id }}')">Back</button>
+          <div class="button-container">
+            <button type="button" onclick="flipCardBack('{{ question.id }}')">Back</button>
           </div>
         </div>
       </div>
@@ -46,12 +53,15 @@
 
       <div class="button-container column">
         <button type="button" onclick="submitQuiz()">Powtórz błędne odpowiedzi</button>
-        <button type="button" onclick="translateAll()" id="translateAllButton">Przetłumacz wszystkie <span class="progress-bar" style="width: 0%"></span></button>
-        <div id="incorrectAnswersCount" style="margin-top: 10px;">Udzielono 0 błędnych odpowiedzi</div>
+        <button type="button" onclick="translateAll()" id="translateAllButton">
+          Przetłumacz wszystkie <span class="progress-bar" style="width: 0%"></span>
+        </button>
+        <div id="incorrectAnswersCount" style="margin-top: 10px;">
+          Udzielono 0 błędnych odpowiedzi
+        </div>
       </div>   
     </form>
 
     <script src="/static/js/quiz_script.js"></script>
   </body>
 </html>
-

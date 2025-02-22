@@ -152,3 +152,17 @@ button:hover {
 #incorrectAnswersCount.high {
   color: var(--text-color);
 }
+
+/* Pozycjonowanie pytania */
+.question {
+  position: relative;  
+}
+
+/* Numer pytania w lewym górnym rogu, mała, biała czcionka */
+.question .question-id {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 0.8em; 
+  color: #fff;
+}

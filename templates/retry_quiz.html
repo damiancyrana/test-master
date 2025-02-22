@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <title>{{ file_name }} Powtórka</title>
-    <link rel="stylesheet" href="/static/css/quiz_style.css">
+    <link rel="stylesheet" href="/static/css/quiz_style.css" />
   </head>
 
   <body>
     <form id="retryQuizForm" method="POST" action="/submit_retry">
       {% for question in questions %}
       <div class="question" data-question-id="{{ question.id }}">
-        <h3>{{ question.question }}</h3>
+        <!-- Zwróć uwagę na "|safe" -->
+        <h3>{{ question.question|safe }}</h3>
         {% for answer in question.answers %}
         <div class="answer-container">
           <input
@@ -20,20 +21,24 @@
             value="{{ answer.text }}"
             data-is-correct="{{ 'true' if answer.is_correct else 'false' }}"
           />
-          <label for="answer{{ loop.index }}_{{ question.id }}">{{ answer.text }}</label>
+          <!-- Zwróć uwagę na "|safe" -->
+          <label for="answer{{ loop.index }}_{{ question.id }}">{{ answer.text|safe }}</label>
         </div>
         {% endfor %}
 
-      <div class="button-container">
-        <button type="button" onclick="checkAnswer(this)">Check</button>
-        <button type="button" onclick="showCorrectAnswer(this)">Correct</button>
-        <button type="button" class="translate-button" onclick="translateQuestion('{{ question.id }}')">Translate</button>
-        <button type="button" onclick="restart(this)">Restart</button>
-      </div>
-
+        <div class="button-container">
+          <button type="button" onclick="checkAnswer(this)">Check</button>
+          <button type="button" onclick="showCorrectAnswer(this)">Correct</button>
+          <button type="button" class="translate-button" onclick="translateQuestion('{{ question.id }}')">
+            Translate
+          </button>
+          <button type="button" onclick="restart(this)">Restart</button>
+        </div>
       </div>
       {% endfor %}
-      <div class="button-container"><button type="submit">SEND</button></div>
+      <div class="button-container">
+        <button type="submit">SEND</button>
+      </div>
     </form>
 
     <script src="/static/js/quiz_script.js"></script>
